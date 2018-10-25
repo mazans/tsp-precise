@@ -184,30 +184,27 @@ TSP_result TSPResolver::resolve_using_branch_and_bound(Graph & graph) {
 // ********************************************** //
 
 TSP_result TSPResolver::resolve_using_bruteforce(Graph &graph) {
-    //Utworzenie sciezki 0,1,2,..n,0
-    vector<int> path(graph.get_vertix_number()+1);
-    for(int i = 0; i < graph.get_vertix_number(); i++) {
-        path[i] = i;
-    }
-    path[graph.get_vertix_number()+1] = 0;
-
     TSP_result result;
     result.cost = INT_MAX;
 
-    //funkcja bedzie wykonyac permutacje na przygotowanej sciezce, nie zmieniajac pozycji pierwszej i ostatniej
-    //(gdyz musi byc to zawsze 0)
+    vector<int> path(graph.get_vertix_number() + 1);
+    for(int i = 0; i < graph.get_vertix_number(); i++) {
+        path[i] = i;
+    }
+    path[graph.get_vertix_number()] = 0;
+
     bruteforce_helper(path, graph.get_vertix_number(), result.cost, result.path, graph);
 
     return result;
 }
 
-void TSPResolver::bruteforce_helper(vector<int>& path, int number, int& best_cost, vector<int>& best_path, Graph& graph) {
+void TSPResolver::bruteforce_helper(vector<int> &path, int number, int &min_cost, vector<int> &best_path, Graph &graph) {
     if(number == 1) {
         int cost = 0;
         for(int i = 0; i < graph.get_vertix_number(); i++)
             cost += graph.get_edge_value(path[i], path[i+1]);
-        if(cost < best_cost) {
-            best_cost = cost;
+        if(cost < min_cost) {
+            min_cost = cost;
             best_path = path;
         }
     }
@@ -216,15 +213,15 @@ void TSPResolver::bruteforce_helper(vector<int>& path, int number, int& best_cos
         for(int i = 1; i < number; i++) {
             a = path[i];
             b = path[number-1];
-            path[number-1] = a;
             path[i] = b;
+            path[number-1] = a;
 
-            bruteforce_helper(path, number-1, best_cost, best_path, graph);
+            bruteforce_helper(path, number-1, min_cost, best_path, graph);
 
             a = path[i];
             b = path[number-1];
-            path[number-1] = a;
             path[i] = b;
+            path[number-1] = a;
         }
     }
 }
