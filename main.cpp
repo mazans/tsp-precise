@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <chrono>
 #include "Graph.h"
+#include "TSPResolver.h"
 
 using namespace std;
 
@@ -90,7 +91,15 @@ void test_graph_from_file() {
         return;
     }
     show_graph(graph);
-    TSP_result result = graph->tsk_dynamic();
+    TSP_result result;
+    result = TSPResolver::resolve_using_dynamic_algorithm(*graph);
+    cout << "Programowanie dynamiczne:" << endl;
+    show_result(result);
+    result = TSPResolver::resolve_using_bruteforce(*graph);
+    cout << "Przeglad zupelny:" << endl;
+    show_result(result);
+    result = TSPResolver::resolve_using_branch_and_bound(*graph);
+    cout << "Metoda podzialu i ograniczen:" << endl;
     show_result(result);
     cin.get();
     cin.get();
@@ -116,6 +125,7 @@ void show_result(TSP_result& result) {
     for(int vertix : result.path) {
         cout << "-" << vertix;
     }
+    cout << endl;
 }
 
 void test_time_execution() {
@@ -136,7 +146,7 @@ void test_time_execution() {
         for(int k = 0; k < graph_amount; k++) {
             gr = generate_graph(graph_size[i]);
             start = Clock::now();
-            gr.tsk_dynamic();
+            TSPResolver::resolve_using_dynamic_algorithm(gr);
             stop = Clock::now();
             execution_time +=  chrono::duration_cast<chrono::nanoseconds>(stop-start).count();
         }
