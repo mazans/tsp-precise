@@ -20,6 +20,17 @@ Graph::Graph(int verticesAmount) {
     }
 }
 
+Graph::Graph(const Graph & graph) {
+
+    vertices_amount = graph.vertices_amount;
+    matrix = new int *[vertices_amount];
+    for(int i = 0; i < vertices_amount; i++){
+        matrix[i] = new int[vertices_amount];
+        for(int j = 0; j < vertices_amount; j++)
+            matrix[i][j] = graph.matrix[i][j];
+    }
+}
+
 Graph Graph::operator=(const Graph & graph) {
     if(this == &graph)
         return *this;
@@ -34,7 +45,7 @@ Graph Graph::operator=(const Graph & graph) {
     for(int i = 0; i < vertices_amount; i++){
         matrix[i] = new int[vertices_amount];
         for(int j = 0; j < vertices_amount; j++)
-            matrix[i][j] = 0;
+            matrix[i][j] = graph.matrix[i][j];
     }
 
     return *this;

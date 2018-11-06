@@ -13,19 +13,19 @@
 
 //Glowna funkcja oparta na dynamicznym algorytmie Helda-Karpa
 TSP_result TSPResolver::resolve_using_dynamic_algorithm(Graph &graph) {
-    TSP_result result;
+    TSP_result result {INT_MAX, vector<int>(graph.get_vertix_number()+1)};
     DynamicMemoryTable table(graph.get_vertix_number());
 
     first_phase(table, graph);
     calculation_phase(table, graph);
     result.cost = find_min_cost(table, graph);
-    result.path = find_optimal_tour(table, graph);
+    find_optimal_tour(table, graph, result.path);
 
     return result;
 }
 
 //Funkcja wykonująca pierwszą fazę algorytmu
-//Wyznacza koszt przebycia komiwojazera z wierzcholka 0 do kzdego z pozostalych wierzcholkow
+//Wyznacza koszt przebycia komiwojazera z wierzcholka 0 do kazdego z pozostalych wierzcholkow
 //Zapisuje ten koszt w tabeli
 void TSPResolver::first_phase(DynamicMemoryTable &table, Graph& graph) {
     for(int vertex = 1; vertex < graph.get_vertix_number(); vertex++) {
@@ -106,8 +106,7 @@ int TSPResolver::find_min_cost(DynamicMemoryTable &table, Graph& graph){
     return result;
 }
 
-vector<int> TSPResolver::find_optimal_tour(DynamicMemoryTable &table, Graph& graph) {
-    vector<int> result(graph.get_vertix_number()+1);
+void TSPResolver::find_optimal_tour(DynamicMemoryTable &table, Graph& graph, vector<int> & result) {
 
     int old_distance, new_distance, previous_index;
     //zaczynamy szukanie naszej sciezki od konca, ostatni wierzcholek ma indeks 0
@@ -137,8 +136,6 @@ vector<int> TSPResolver::find_optimal_tour(DynamicMemoryTable &table, Graph& gra
     }
 
     result[0] = result[graph.get_vertix_number()] = 0;
-
-    return result;
 }
 
 // ********************************************** //

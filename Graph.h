@@ -15,6 +15,7 @@ public:
     Graph(int verticesNumber);
     ~Graph();
 
+    Graph(const Graph & graph);
     Graph operator=(const Graph& graph);
 
     int get_vertix_number();
