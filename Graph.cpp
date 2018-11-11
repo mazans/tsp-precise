@@ -51,15 +51,15 @@ Graph Graph::operator=(const Graph & graph) {
     return *this;
 }
 
-int Graph::get_edge_value(int from, int to) {
+int Graph::getEdgeValue(int from, int to) {
     return matrix[from][to];
 }
 
-void Graph::set_edge_value(int from, int to, int value) {
+void Graph::setEdgeValue(int from, int to, int value) {
     matrix[from][to] = value;
 }
 
-int Graph::get_vertix_number() {
+int Graph::getVertixNumber() {
     return vertices_amount;
 }
 

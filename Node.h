@@ -2,35 +2,38 @@
 #define PEA_ETAP1_NODE_H
 
 #include <list>
-#include "ResultCostMatrix.h"
+#include "Graph.h"
 
 using namespace std;
 
 class Node {
 private:
-    ResultCostMatrix node_rcm;
     vector<int> path;
     int cost;
+    int bound;
+    int last_vertix;
+    int graph_size;
+    bool * is_in_solution;
+
+    Node(Node & paernt, int new_vertix, Graph & graph); //konstruktor sluzacy do tworzenia dzeci-wezlow
+
+    void calculateBound(Graph & graph);
+    void calculateCost(Graph & graph);
 public:
     Node();
-    ~Node() {}
-    Node(vector<int>& path, ResultCostMatrix & rcm, int cost); //konstruktor sluzacy do tworzenia dzeci-wezlow
-    Node(Graph & gr); //konstruktor wezla-rodzica
+    Node(int graph_size); //konstruktor wezla-rodzica
+    ~Node();
 
-    list<Node> get_node_children(int vertices_amount);
+    Node& operator=(const Node & node);
+    Node(const Node & node);
 
-    void set_cost(int cost);
-    int get_cost() const;
+    list<Node> getNodeChildren(Graph & graph, list<Node> &result);
 
-    vector<int> & get_path();
-    int get_amount_of_nodes_in_path();
+    int getCost();
+    int getBound() const;
 
-    void set_result_cost_matrix(ResultCostMatrix & rcm);
-    ResultCostMatrix & get_result_cost_matrix();
-
-    int get_last_vertix();
-
-    void show_Node();
+    vector<int> & getPath();
+    int getLastVertix();
 };
 
 bool operator<(const Node& first, const Node& second);

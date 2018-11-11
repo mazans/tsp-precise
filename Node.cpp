@@ -5,74 +5,151 @@
 #include "Node.h"
 
 Node::Node() {
-    path.push_back(0);
-    cost = -1;
+    is_in_solution = new bool[1];
 }
 
-Node::Node(Graph & gr){
-    path.push_back(0);
-    node_rcm = ResultCostMatrix(gr);
-    cost = node_rcm.reduce_matrix();
+
+Node::Node(int graph_size){
+    path = vector<int>({0});
+    cost = INT_MAX;
+    bound = INT_MAX;
+    last_vertix = 0;
+    this->graph_size = graph_size;
+
+    is_in_solution = new bool[graph_size];
+    for(int i = 0; i < graph_size; i++)
+        is_in_solution[i] = false;
+    is_in_solution[0] = true;
+
 }
 
-Node::Node(vector<int> &path, ResultCostMatrix &rcm, int cost) {
-    this->path = path;
-    this->node_rcm = rcm;
-    this->cost = cost;
+Node::Node(Node & parent, int new_vertix, Graph & graph) {
+    this->path = parent.path;
+    this->path.push_back(new_vertix);
+    this->graph_size = parent.graph_size;
+    this->last_vertix = new_vertix;
+
+    this->is_in_solution = new bool[graph_size];
+    for(int i = 0; i < graph_size; i++)
+        this->is_in_solution[i] = parent.is_in_solution[i];
+    this->is_in_solution[new_vertix] = true;
+
+    calculateBound(graph);
+    calculateCost(graph);
 }
 
-void Node::set_cost(int cost) {
-    this->cost = cost;
+Node::Node(const Node &node) {
+    path = node.path;
+    cost = node.cost;
+    bound = node.bound;
+    last_vertix = node.last_vertix;
+    graph_size = node.graph_size;
+
+    is_in_solution =  new bool[graph_size];
+    for(int i = 0; i < graph_size; i++)
+        is_in_solution[i] = node.is_in_solution[i];
+
 }
 
-int Node::get_cost() const {
+Node& Node::operator=(const Node & node) {
+    if(this == &node)
+        return *this;
+
+    path = node.path;
+    cost = node.cost;
+    bound = node.bound;
+    last_vertix = node.last_vertix;
+    graph_size = node.graph_size;
+
+    delete [] is_in_solution;
+
+    is_in_solution =  new bool[graph_size];
+    for(int i = 0; i < graph_size; i++)
+        is_in_solution[i] = node.is_in_solution[i];
+
+    return *this;
+}
+
+void Node::calculateBound(Graph &graph) {
+    bound = 0;
+
+    for(int i = 0; i < path.size() - 1; i++)
+        bound += graph.getEdgeValue(path[i], path[i+1]);
+
+    int min = INT_MAX;
+    int edge_value;
+    for(int i = 1; i < graph.getVertixNumber(); i++) {
+        if(!is_in_solution[i]) {
+            edge_value = graph.getEdgeValue(last_vertix, i);
+            if(edge_value < min)
+                min = edge_value;
+        }
+    }
+    if(min != INT_MAX)
+        bound += min;
+
+    for(int i = 1; i < graph.getVertixNumber(); i++) {
+        if(!is_in_solution[i]) {
+            min = graph.getEdgeValue(i, 0);
+            for(int j = 1; j < graph.getVertixNumber(); j++) {
+                if(!is_in_solution[i]) {
+                    edge_value = graph.getEdgeValue(i, j);
+                    if(edge_value < min)
+                        min = edge_value;
+                }
+            }
+            bound += min;
+        }
+    }
+}
+
+void Node::calculateCost(Graph & graph) {
+    if(path.size() == graph.getVertixNumber()) {
+        cost = 0;
+        for(int i = 0; i < graph.getVertixNumber() - 1; i++) {
+            cost += graph.getEdgeValue(path[i], path[i+1]);
+        }
+        cost += graph.getEdgeValue(getLastVertix(), 0);
+    }
+    else
+        cost = INT_MAX;
+}
+
+int Node::getCost() {
     return cost;
 }
 
-vector<int> & Node::get_path() {
+vector<int> & Node::getPath() {
     return path;
 }
 
-int Node::get_amount_of_nodes_in_path() {
-    return path.size();
+int Node::getBound() const {
+    return bound;
+}
+
+int Node::getLastVertix() {
+    auto it = path.end();
+    int result = *(--it);
+    return result;
 }
 
 bool operator<(const Node& first, const Node& second) {
-    return first.get_cost() > second.get_cost();
+    return first.getBound() > second.getBound();
 }
 
-list<Node> Node::get_node_children(int verticesAmount) {
-    list<Node> result;
-    int from = get_last_vertix();
-    int child_cost;
-    for(int to = 1; to < verticesAmount; to++){
-        if(find(path.begin(), path.end(), to) == path.end()) {
-            vector<int> child_path = path;
-            child_path.push_back(to);
-
-            ResultCostMatrix child_rcm = node_rcm;
-            child_rcm.remove_vertix(from, to);
-            int additional_cost = child_rcm.reduce_matrix();
-
-            child_cost = cost + additional_cost + node_rcm.getCost(from, to);
-
-            Node node(child_path, child_rcm, child_cost);
+//metoda zwraca wezly-potomkow danego wezla
+list<Node> Node::getNodeChildren(Graph & gr, list<Node> &result) {
+    for(int to = 1; to < gr.getVertixNumber(); to++){
+        if(!is_in_solution[to]) {
+            Node node(*this, to, gr);
             result.push_back(node);
         }
     }
     return result;
 }
 
-void Node::set_result_cost_matrix(ResultCostMatrix & rcm) {
-    node_rcm = rcm;
+Node::~Node() {
+    delete [] is_in_solution;
 }
 
-ResultCostMatrix &Node::get_result_cost_matrix() {
-    return node_rcm;
-}
 
-int Node::get_last_vertix() {
-    vector<int>::iterator it = path.end();
-    int result = *(--it);
-    return result;
-}

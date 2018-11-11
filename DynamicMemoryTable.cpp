@@ -10,22 +10,33 @@
 DynamicMemoryTable::DynamicMemoryTable(int vertices_amount)
 {
     this->vertices_amount = vertices_amount;
-    memory = new int*[vertices_amount-1];
+    memory = new pair<int, int>*[vertices_amount-1];
     int length = pow(2, vertices_amount-1);
     for(int i = 0; i < vertices_amount-1; i++) {
-        memory[i] = new int[length];
+        memory[i] = new pair<int, int>[length];
         for(int j = 0; j < length; j++) {
-            memory[i][j] = INT_MAX;
+            //pierwszy element zapamietuje optymalna wartosc rozwiazania danego podproblemu
+            //drugi element zapamietuje poprzednika ostatniego wierzcholka w danym podproblemie
+            memory[i][j].first = INT_MAX;
+            memory[i][j].first = INT_MAX;
         }
     }
 }
 
 void DynamicMemoryTable::setCost(int vertex, int mask, int cost) {
-    memory[vertex-1][mask] = cost;
+    memory[vertex-1][mask].first = cost;
 }
 
 int DynamicMemoryTable::getCost(int vertex, int mask) {
-    return memory[vertex-1][mask];
+    return memory[vertex-1][mask].first;
+}
+
+void DynamicMemoryTable::setPreviousVertex(int vertex, int mask, int previous_vertex) {
+    memory[vertex-1][mask].second = previous_vertex;
+}
+
+int DynamicMemoryTable::getPreviousVertex(int vertex, int mask) {
+    return memory[vertex-1][mask].second;
 }
 
 DynamicMemoryTable::~DynamicMemoryTable()
@@ -35,3 +46,5 @@ DynamicMemoryTable::~DynamicMemoryTable()
     }
     delete [] memory;
 }
+
+

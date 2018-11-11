@@ -9,6 +9,7 @@
 
 using namespace std;
 
+//wynik wykonywaia sie algorytmu szukajacego najlepszego cyklu dla problemu komiwojazera
 struct TSP_result {
     int cost;
     vector<int> path;
@@ -16,22 +17,25 @@ struct TSP_result {
 
 class TSPResolver {
 private:
-    static void first_phase(DynamicMemoryTable &table, Graph& graph);
-    static void calculation_phase(DynamicMemoryTable &table, Graph& graph);
-    static int find_min_cost(DynamicMemoryTable &table, Graph& graph);
-    static void find_optimal_tour(DynamicMemoryTable &table, Graph& graph, vector<int> & result);
 
-    static list<int> generate_combinations(int amount, int vertices_amount);
-    static void combinations_helper(int current_set, int current_vertex, int repetitions_left,
-                                    list<int>& combinations, int vertices_amount);
+    //funkcje pomocnicze dla programowania dynamicznego
+    static void firstPhase(DynamicMemoryTable &table, Graph &graph);
+    static void calculationPhase(DynamicMemoryTable &table, Graph &graph);
+    static pair<int, int> findMinTour(DynamicMemoryTable &table, Graph &graph);
+    static void findOptimalTour(DynamicMemoryTable &table, Graph &graph, vector<int> &result, int last_vertex);
+
+    static list<int> generateCombinations(int amount, int vertices_amount);
+    static void combinationsHelper(int current_set, int current_vertex, int repetitions_left,
+                                   list<int> &combinations, int vertices_amount);
     static bool contains(int vertex, int set);
 
-    static void bruteforce_helper(vector<int>& path, int number, int& min_cost, vector<int>& best_path, Graph& graph);
+    //funckja pomocnicza dla przegladu zupelnego
+    static void bruteforceHelper(vector<int> &path, int number, int &min_cost, vector<int> &best_path, Graph &graph);
 
 public:
-    static TSP_result resolve_using_dynamic_algorithm(Graph & graph);
-    static TSP_result resolve_using_branch_and_bound(Graph & graph);
-    static TSP_result resolve_using_bruteforce(Graph & graph);
+    static TSP_result resolveUsingDynamicAlgorithm(Graph &graph);
+    static TSP_result resolveUsingBranchAndBound(Graph &graph);
+    static TSP_result resolveUsingBruteforce(Graph &graph);
 };
 
 

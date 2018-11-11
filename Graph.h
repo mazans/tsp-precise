@@ -18,9 +18,9 @@ public:
     Graph(const Graph & graph);
     Graph operator=(const Graph& graph);
 
-    int get_vertix_number();
-    void set_edge_value(int from, int to, int value);
-    int get_edge_value(int from, int to);
+    int getVertixNumber();
+    void setEdgeValue(int from, int to, int value);
+    int getEdgeValue(int from, int to);
 };
 
 #endif //PEA_1_GRAPH_H

@@ -8,13 +8,13 @@
 
 using namespace std;
 
-void test_graph_from_file();
-void test_time_execution();
+void testGraphFromFile();
+void testTimeExecution();
 
-void show_graph(Graph & gr);
-void show_result(TSP_result& result);
+void showGraph(Graph &gr);
+void showResult(TSP_result &result);
 
-Graph generate_graph(int size);
+Graph generateGraph(int size);
 
 
 int main() {
@@ -28,9 +28,9 @@ int main() {
         cout << "X. Wyjdz" << endl;
         cin >> choice;
         if(choice == '1')
-            test_graph_from_file();
+            testGraphFromFile();
         else if(choice == '2')
-            test_time_execution();
+            testTimeExecution();
         else if(choice == 'X')
             break;
         system("clear");
@@ -38,7 +38,7 @@ int main() {
     return 0;
 }
 
-void test_graph_from_file() {
+void testGraphFromFile() {
     string file_name;
     cout << "Podaj nazwe pliku z ktorego maja zostac pobrane dane: ";
     cin >> file_name;
@@ -76,7 +76,7 @@ void test_graph_from_file() {
                     }
                     else
                     {
-                        graph.set_edge_value(i, j, val);
+                        graph.setEdgeValue(i, j, val);
                     }
                 }
             }
@@ -90,34 +90,57 @@ void test_graph_from_file() {
         cin.get();
         return;
     }
-    show_graph(graph);
-    TSP_result result;
-    result = TSPResolver::resolve_using_dynamic_algorithm(graph);
-    cout << "Programowanie dynamiczne:" << endl;
-    show_result(result);
-    result = TSPResolver::resolve_using_branch_and_bound(graph);
-    cout << "Metoda podzialu i ograniczen:" << endl;
-    show_result(result);
-    result = TSPResolver::resolve_using_bruteforce(graph);
-    cout << "Przeglad zupelny:" << endl;
-    show_result(result);
-    cin.get();
+    while(true) {
+        char choice;
+        TSP_result result;
+        showGraph(graph);
+        cout << "Wybierz opcje: " << endl;
+        cout << "1. Programowanie dynamiczne" << endl;
+        cout << "2. Metoda podzialu i ograniczen" << endl;
+        cout << "3. Przeglad zupelny" << endl;
+        cout << "X. Wyjdz" << endl;
+        cin >> choice;
+        cin.get();
+        if(choice == '1') {
+            result = TSPResolver::resolveUsingDynamicAlgorithm(graph);
+            cout << "Programowanie dynamiczne:" << endl;
+            showResult(result);
+        }
+        else if(choice == '2') {
+            result = TSPResolver::resolveUsingBranchAndBound(graph);
+            cout << "Metoda podzialu i ograniczen:" << endl;
+            showResult(result);
+        }
+        else if(choice == '3') {
+            result = TSPResolver::resolveUsingBruteforce(graph);
+            cout << "Przeglad zupelny:" << endl;
+            showResult(result);
+        }
+        else if(choice == 'X') {
+            break;
+        }
+        else {
+            cout << "Nieprawidlowa opcja" << endl;
+        }
+        cin.get();
+    }
+
 }
 
-void show_graph(Graph & gr) {
+void showGraph(Graph &gr) {
     cout << "Graf:" << endl;
-    for (int i = 0; i < gr.get_vertix_number(); i++)
+    for (int i = 0; i < gr.getVertixNumber(); i++)
     {
-        for(int j = 0; j < gr.get_vertix_number(); j++)
+        for(int j = 0; j < gr.getVertixNumber(); j++)
         {
-            cout << setw(3) << gr.get_edge_value(i, j);
+            cout << setw(3) << gr.getEdgeValue(i, j);
             cout << " ";
         }
         cout << endl << endl;
     }
 }
 
-void show_result(TSP_result& result) {
+void showResult(TSP_result &result) {
     cout << "Optymalna dlugosc sciezki: " << result.cost << endl;
     cout << "Wierzcholki optymalnej scezki:" << endl;
     for(int vertix : result.path) {
@@ -126,32 +149,33 @@ void show_result(TSP_result& result) {
     cout << endl;
 }
 
-void test_time_execution() {
-    int size_amount = 7;
+void testTimeExecution() {
+    int size_amount = 12;
+    int brute_size_amount = 9;
     int graph_amount = 100;
 
-    int graph_size[size_amount] = {4, 6, 8, 10, 12, 14, 16};
+    int graph_size[size_amount] = {4, 5, 6, 7, 8, 9, 10, 11, 12, 14, 16, 18};
 
-    int graph_size_brute[size_amount] = {4, 5, 6, 7 ,8 ,9 ,10, 11, 12};
+    int graph_size_brute[brute_size_amount] = {4, 5, 6, 7 ,8 ,9 ,10, 11, 12};
 
     Graph gr;
     long long dynamic_execution_time, bb_execution_time, bruteforce_execution_time;
 
     typedef chrono::high_resolution_clock Clock;
     chrono::time_point<Clock> start, stop;
-        for(int i = 0; i < size_amount; i++)
+    for(int i = 0; i < size_amount; i++)
     {
         bb_execution_time = dynamic_execution_time = 0;
         for(int k = 0; k < graph_amount; k++) {
-            gr = generate_graph(graph_size[i]);
+            gr = generateGraph(graph_size[i]);
 
             start = Clock::now();
-            TSPResolver::resolve_using_dynamic_algorithm(gr);
+            TSPResolver::resolveUsingDynamicAlgorithm(gr);
             stop = Clock::now();
             dynamic_execution_time +=  chrono::duration_cast<chrono::nanoseconds>(stop-start).count();
 
             start = Clock::now();
-            TSPResolver::resolve_using_branch_and_bound(gr);
+            TSPResolver::resolveUsingBranchAndBound(gr);
             stop = Clock::now();
             bb_execution_time +=  chrono::duration_cast<chrono::nanoseconds>(stop-start).count();
         }
@@ -161,14 +185,14 @@ void test_time_execution() {
         cout << "Czas wykonania(metoda podzialu i ograniczen): " << bb_execution_time/graph_amount << endl;
     }
 
-    for(int i = 0; i < size_amount; i++)
+    for(int i = 0; i < brute_size_amount; i++)
     {
         bruteforce_execution_time = 0;
         for(int k = 0; k < graph_amount; k++) {
-            gr = generate_graph(graph_size_brute[i]);
+            gr = generateGraph(graph_size_brute[i]);
 
             start = Clock::now();
-            TSPResolver::resolve_using_bruteforce(gr);
+            TSPResolver::resolveUsingBruteforce(gr);
             stop = Clock::now();
             bruteforce_execution_time +=  chrono::duration_cast<chrono::nanoseconds>(stop-start).count();
         }
@@ -178,7 +202,7 @@ void test_time_execution() {
     }
 }
 
-Graph generate_graph(int size) {
+Graph generateGraph(int size) {
     Graph result(size);
     int scale;
 
@@ -186,7 +210,7 @@ Graph generate_graph(int size) {
         for(int j = 0; j < size; j++) {
             if(i != j) {
                 scale = rand() % 500 + 1;
-                result.set_edge_value(i, j, scale);
+                result.setEdgeValue(i, j, scale);
             }
         }
     }
