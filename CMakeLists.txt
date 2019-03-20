@@ -3,4 +3,4 @@ project(PEA_ETAP1)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(PEA_ETAP1 main.cpp Graph.h Graph.cpp TSPResolver.cpp TSPResolver.h DynamicMemoryTable.cpp DynamicMemoryTable.h Node.cpp Node.h)
+add_executable(PEA_ETAP1 main.cpp Graph.h Graph.cpp TSPResolver.cpp TSPResolver.h DynamicMemoryTable.cpp DynamicMemoryTable.h)

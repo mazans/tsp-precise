@@ -4,7 +4,6 @@
 #include <vector>
 #include "Graph.h"
 #include "DynamicMemoryTable.h"
-#include "Node.h"
 
 
 using namespace std;
@@ -28,6 +27,10 @@ private:
     static void combinationsHelper(int current_set, int current_vertex, int repetitions_left,
                                    list<int> &combinations, int vertices_amount);
     static bool contains(int vertex, int set);
+
+    static void branchAndBoundHelper(vector<int> &path, int number, int &min_cost, vector<int> &best_path, Graph &graph);
+
+    static int calculateBound(vector<int> &path, int number, Graph & graph);
 
     //funckja pomocnicza dla przegladu zupelnego
     static void bruteforceHelper(vector<int> &path, int number, int &min_cost, vector<int> &best_path, Graph &graph);

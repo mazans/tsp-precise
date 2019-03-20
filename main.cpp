@@ -91,6 +91,9 @@ void testGraphFromFile() {
         return;
     }
     while(true) {
+        typedef chrono::high_resolution_clock Clock;
+        chrono::time_point<Clock> start, stop;
+
         char choice;
         TSP_result result;
         showGraph(graph);
@@ -102,19 +105,31 @@ void testGraphFromFile() {
         cin >> choice;
         cin.get();
         if(choice == '1') {
+            start = Clock::now();
             result = TSPResolver::resolveUsingDynamicAlgorithm(graph);
+            stop = Clock::now();
+            long time = chrono::duration_cast<chrono::nanoseconds>(stop-start).count();
             cout << "Programowanie dynamiczne:" << endl;
             showResult(result);
+            cout << "Czas wykonywania: " << time/1000000.0 << " milisekund" << endl;
         }
         else if(choice == '2') {
+            start = Clock::now();
             result = TSPResolver::resolveUsingBranchAndBound(graph);
+            stop = Clock::now();
+            long time = chrono::duration_cast<chrono::nanoseconds>(stop-start).count();
             cout << "Metoda podzialu i ograniczen:" << endl;
             showResult(result);
+            cout << "Czas wykonywania: " << time/1000000.0 << " milisekund" << endl;
         }
         else if(choice == '3') {
+            start = Clock::now();
             result = TSPResolver::resolveUsingBruteforce(graph);
+            stop = Clock::now();
+            long time = chrono::duration_cast<chrono::nanoseconds>(stop-start).count();
             cout << "Przeglad zupelny:" << endl;
             showResult(result);
+            cout << "Czas wykonywania: " << time/1000000.0 << " milisekund" << endl;
         }
         else if(choice == 'X') {
             break;
@@ -209,7 +224,7 @@ Graph generateGraph(int size) {
     for(int i = 0; i < size; i++) {
         for(int j = 0; j < size; j++) {
             if(i != j) {
-                scale = rand() % 500 + 1;
+                scale = rand() % 100 + 1;
                 result.setEdgeValue(i, j, scale);
             }
         }

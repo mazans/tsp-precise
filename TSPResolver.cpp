@@ -143,29 +143,62 @@ TSP_result TSPResolver::resolveUsingBranchAndBound(Graph &graph) {
     TSP_result result;
     result.cost = INT_MAX;
 
-    Node parent_node(graph.getVertixNumber());
+    vector<int> path(graph.getVertixNumber() + 1);
+    for(int i = 0; i < graph.getVertixNumber(); i++)
+        path[i] = i;
+    path[graph.getVertixNumber()] = 0;
 
-    priority_queue<Node> node_queue;
-    node_queue.push(parent_node);
+    branchAndBoundHelper(path, 1, result.cost, result.path, graph);
 
-    while(!node_queue.empty()) {
-        Node current_node = node_queue.top();
-        node_queue.pop();
+    return result;
+}
 
-        list<Node> children;
-        current_node.getNodeChildren(graph, children);
+void TSPResolver::branchAndBoundHelper(vector<int> &path, int number, int &min_cost, vector<int> &best_path,
+                                       Graph &graph) {
 
-        for(Node child_node : children) {
-            if(child_node.getCost() < result.cost) {
-                result.cost = child_node.getCost();
-                result.path = child_node.getPath();
-            }
-            else if(child_node.getBound() < result.cost)
-                node_queue.push(child_node);
+    if(number == graph.getVertixNumber()) {
+        int cost = 0;
+        for(int i = 0; i < graph.getVertixNumber(); i++)
+            cost += graph.getEdgeValue(path[i], path[i+1]);
+        if(cost < min_cost) {
+            min_cost = cost;
+            best_path = path;
         }
     }
-    result.path.push_back(0);
-    return result;
+    else {
+        if(calculateBound(path, number-1, graph) < min_cost) {
+            for(int i = number; i < graph.getVertixNumber(); i++) {
+                swap(path[i], path[number]);
+                branchAndBoundHelper(path, number + 1, min_cost, best_path, graph);
+                swap(path[i], path[number]);
+            }
+        }
+    }
+}
+
+int TSPResolver::calculateBound(vector<int> &path, int number, Graph &graph) {
+    int bound = 0;
+
+    for(int i = 0; i < number; i++)
+        bound += graph.getEdgeValue(path[i], path[i+1]);
+
+    int min = graph.getEdgeValue(path[number], path[number+1]);
+    for(int i = number+2; i < graph.getVertixNumber(); i++) {
+        if(graph.getEdgeValue(path[number], path[i]) < min)
+            min = graph.getEdgeValue(path[number], path[i]);
+    }
+    bound += min;
+
+    for(int i = number + 1; i < graph.getVertixNumber(); i++) {
+        min = graph.getEdgeValue(path[i], 0);
+        for(int j = number + 1; j < graph.getVertixNumber(); j++) {
+            if(i != j && graph.getEdgeValue(path[i], path[j]) < min)
+                min = graph.getEdgeValue(path[i], path[j]);
+        }
+        bound += min;
+    }
+
+    return bound;
 }
 
 // ********************************************** //
